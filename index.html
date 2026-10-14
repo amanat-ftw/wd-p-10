@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Planner & CGPA Target Tracker</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <!-- Header Section -->
+    <header class="bg-indigo-600 text-white shadow-md py-6 px-4 sm:px-8">
+        <div class="max-w-5xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">📚 Study Planner & CGPA Tracker</h1>
+                <p class="text-indigo-200 text-sm mt-1">"Small daily improvements lead to stunning results."</p>
+            </div>
+            <div class="bg-indigo-700/60 px-4 py-2 rounded-lg border border-indigo-500/40 text-xs sm:text-sm">
+                Status: <span id="current-term-label" class="font-semibold text-emerald-300">Active Semester</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-5xl w-full mx-auto p-4 sm:p-6 flex-grow space-y-6">
+
+        <!-- Dashboard Summary Cards -->
+        <section class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+                <div>
+                    <p class="text-xs uppercase tracking-wider font-semibold text-slate-400">Total Subjects</p>
+                    <h2 id="stat-total-subjects" class="text-2xl font-bold text-slate-700 mt-1">0</h2>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold">📖</div>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+                <div>
+                    <p class="text-xs uppercase tracking-wider font-semibold text-slate-400">Target CGPA</p>
+                    <h2 id="stat-target-cgpa" class="text-2xl font-bold text-slate-700 mt-1">3.80</h2>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 font-bold">🎯</div>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+                <div>
+                    <p class="text-xs uppercase tracking-wider font-semibold text-slate-400">Est. Weekly Hours</p>
+                    <h2 id="stat-weekly-hours" class="text-2xl font-bold text-slate-700 mt-1">0 hrs</h2>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center text-amber-600 font-bold">⏱️</div>
+            </div>
+        </section>
+
+        <!-- Dynamic Progress Bar -->
+        <section class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-sm font-semibold text-slate-700">Task Completion Progress</span>
+                <span id="progress-text" class="text-sm font-bold text-indigo-600">0%</span>
+            </div>
+            <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
+                <div id="progress-bar" class="bg-indigo-600 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+        </section>
+
+        <!-- Two Column Workspace: Subject/Task Manager & CGPA Calculator -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+            <!-- Column 1: Interactive Subject & Task Manager -->
+            <section class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <span>📝</span> Subject & Study Task Manager
+                    </h2>
+
+                    <!-- Add Subject Form -->
+                    <form id="subject-form" class="space-y-3 mb-5">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Subject / Task Name</label>
+                            <input type="text" id="subject-name" required placeholder="e.g., Data Structures" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Est. Hours</label>
+                                <input type="number" id="subject-hours" required min="1" max="50" placeholder="e.g., 5" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Target Goal</label>
+                                <input type="text" id="subject-goal" placeholder="e.g., Grade A" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors cursor-pointer">
+                            Add Subject
+                        </button>
+                    </form>
+
+                    <!-- Subjects List -->
+                    <div>
+                        <h3 class="text-xs font-semibold tracking-wider text-slate-400 uppercase mb-2">Active Subjects List</h3>
+                        <div id="subjects-container" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+                            <!-- Dynamic items populate here -->
+                            <p id="empty-subjects" class="text-sm text-slate-400 italic text-center py-4">No subjects added yet. Add one above!</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Column 2: CGPA Calculator Quick Tool -->
+            <section class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <span>🧮</span> CGPA Quick Calculator
+                    </h2>
+
+                    <!-- Add Course Form -->
+                    <form id="course-form" class="space-y-3 mb-5">
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="col-span-1">
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Course</label>
+                                <input type="text" id="course-title" required placeholder="CS101" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Credits</label>
+                                <input type="number" id="course-credits" required min="1" max="6" value="3" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Grade Points</label>
+                                <input type="number" id="course-gpa" required step="0.1" min="0.0" max="4.0" value="3.5" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors cursor-pointer">
+                            Add Course to GPA
+                        </button>
+                    </form>
+
+                    <!-- Courses Table / List -->
+                    <div class="overflow-hidden border border-slate-200 rounded-lg mb-4">
+                        <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-600 font-semibold border-b border-slate-200">
+                                    <th class="p-2.5">Course</th>
+                                    <th class="p-2.5">Credits</th>
+                                    <th class="p-2.5">Points</th>
+                                    <th class="p-2.5 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="courses-table-body">
+                                <!-- Dynamic rows populate here -->
+                                <tr id="empty-courses">
+                                    <td colspan="4" class="p-4 text-center text-slate-400 italic">No courses added for calculation.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Calculated GPA Result Box -->
+                <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-emerald-800">Current Semester GPA</p>
+                        <p class="text-xs text-emerald-600">Calculated based on added credits</p>
+                    </div>
+                    <div id="calculated-gpa" class="text-2xl font-black text-emerald-700">0.00</div>
+                </div>
+            </section>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-6 text-xs text-slate-400 border-t border-slate-200 mt-8">
+        Study Planner & CGPA Target Tracker &copy; 2026 | Built cleanly with Vanilla JS & Tailwind CSS
+    </footer>
+
+    <!-- Client-Side Application Script -->
+    <script>
+        // Simple state arrays for subjects and courses
+        let subjects = [];
+        let courses = [];
+
+        // DOM Element References
+        const subjectForm = document.getElementById('subject-form');
+        const subjectNameInput = document.getElementById('subject-name');
+        const subjectHoursInput = document.getElementById('subject-hours');
+        const subjectGoalInput = document.getElementById('subject-goal');
+        const subjectsContainer = document.getElementById('subjects-container');
+
+        const courseForm = document.getElementById('course-form');
+        const courseTitleInput = document.getElementById('course-title');
+        const courseCreditsInput = document.getElementById('course-credits');
+        const courseGpaInput = document.getElementById('course-gpa');
+        const coursesTableBody = document.getElementById('courses-table-body');
+        const calculatedGpaDisplay = document.getElementById('calculated-gpa');
+
+        const statTotalSubjects = document.getElementById('stat-total-subjects');
+        const statWeeklyHours = document.getElementById('stat-weekly-hours');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+
+        // --- SUBJECT MANAGER LOGIC ---
+        subjectForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newSubject = {
+                id: Date.now(),
+                name: subjectNameInput.value.trim(),
+                hours: parseFloat(subjectHoursInput.value) || 0,
+                goal: subjectGoalInput.value.trim() || 'N/A',
+                completed: false
+            };
+
+            subjects.push(newSubject);
+            subjectForm.reset();
+            renderSubjects();
+            updateDashboardStats();
+        });
+
+        function toggleSubjectCompletion(id) {
+            const subject = subjects.find(s => s.id === id);
+            if (subject) {
+                subject.completed = !subject.completed;
+                renderSubjects();
+                updateDashboardStats();
+            }
+        }
+
+        function deleteSubject(id) {
+            subjects = subjects.filter(s => s.id !== id);
+            renderSubjects();
+            updateDashboardStats();
+        }
+
+        function renderSubjects() {
+            if (subjects.length === 0) {
+                subjectsContainer.innerHTML = `<p id="empty-subjects" class="text-sm text-slate-400 italic text-center py-4">No subjects added yet. Add one above!</p>`;
+                return;
+            }
+
+            subjectsContainer.innerHTML = '';
+            subjects.forEach(subject => {
+                const item = document.createElement('div');
+                item.className = `flex items-center justify-between p-3 rounded-lg border transition-all ${subject.completed ? 'bg-slate-50 border-slate-200 opacity-60' : 'bg-white border-slate-200'}`;
+                
+                item.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" ${subject.completed ? 'checked' : ''} onclick="toggleSubjectCompletion(${subject.id})" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer">
+                        <div>
+                            <p class="text-sm font-semibold text-slate-700 ${subject.completed ? 'line-through text-slate-400' : ''}">${escapeHtml(subject.name)}</p>
+                            <p class="text-xs text-slate-400">Est: ${subject.hours} hrs | Goal: ${escapeHtml(subject.goal)}</p>
+                        </div>
+                    </div>
+                    <button onclick="deleteSubject(${subject.id})" class="text-slate-400 hover:text-red-500 text-sm p-1 transition-colors cursor-pointer" title="Delete Subject">🗑️</button>
+                `;
+                subjectsContainer.appendChild(item);
+            });
+        }
+
+        // --- DASHBOARD STATS LOGIC ---
+        function updateDashboardStats() {
+            const total = subjects.length;
+            statTotalSubjects.textContent = total;
+
+            const totalHours = subjects.reduce((acc, curr) => acc + curr.hours, 0);
+            statWeeklyHours.textContent = totalHours + ' hrs';
+
+            const completedCount = subjects.filter(s => s.completed).length;
+            const percentage = total === 0 ? 0 : Math.round((completedCount / total) * 100);
+
+            progressBar.style.width = percentage + '%';
+            progressText.textContent = percentage + '%';
+        }
+
+        // --- CGPA CALCULATOR LOGIC ---
+        courseForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const newCourse = {
+                id: Date.now(),
+                title: courseTitleInput.value.trim(),
+                credits: parseFloat(courseCreditsInput.value) || 0,
+                gpa: parseFloat(courseGpaInput.value) || 0.0
+            };
+
+            courses.push(newCourse);
+            courseForm.reset();
+            // Reset fields back to friendly defaults
+            courseCreditsInput.value = "3";
+            courseGpaInput.value = "3.5";
+            
+            renderCourses();
+            calculateGPA();
+        });
+
+        function deleteCourse(id) {
+            courses = courses.filter(c => c.id !== id);
+            renderCourses();
+            calculateGPA();
+        }
+
+        function renderCourses() {
+            if (courses.length === 0) {
+                coursesTableBody.innerHTML = `<tr id="empty-courses"><td colspan="4" class="p-4 text-center text-slate-400 italic">No courses added for calculation.</td></tr>`;
+                return;
+            }
+
+            coursesTableBody.innerHTML = '';
+            courses.forEach(course => {
+                const row = document.createElement('tr');
+                row.className = 'border-b border-slate-100 hover:bg-slate-50';
+                row.innerHTML = `
+                    <td class="p-2.5 font-medium text-slate-700">${escapeHtml(course.title)}</td>
+                    <td class="p-2.5 text-slate-600">${course.credits}</td>
+                    <td class="p-2.5 text-slate-600">${course.gpa.toFixed(1)}</td>
+                    <td class="p-2.5 text-right">
+                        <button onclick="deleteCourse(${course.id})" class="text-slate-400 hover:text-red-500 text-xs transition-colors cursor-pointer">Remove</button>
+                    </td>
+                `;
+                coursesTableBody.appendChild(row);
+            });
+        }
+
+        function calculateGPA() {
+            if (courses.length === 0) {
+                calculatedGpaDisplay.textContent = "0.00";
+                return;
+            }
+
+            let totalQualityPoints = 0;
+            let totalCredits = 0;
+
+            courses.forEach(course => {
+                totalQualityPoints += (course.credits * course.gpa);
+                totalCredits += course.credits;
+            });
+
+            const semesterGpa = totalCredits === 0 ? 0 : (totalQualityPoints / totalCredits);
+            calculatedGpaDisplay.textContent = semesterGpa.toFixed(2);
+        }
+
+        // Simple helper to avoid XSS issues with user inputs
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
